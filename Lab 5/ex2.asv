@@ -1,0 +1,73 @@
+%% Signal and Systems Laboratory 5
+%           Exercise 2
+%           Sound Wave Processing - Fourier Transform
+%           Low Pass Fi
+
+clear;
+clc;
+
+%% Ερώτημα Α
+[x, Fs] = audioread('noisy.wav');
+sound(x, Fs);
+
+
+%% Ερώτημα Β
+Fc = 3500;        % Hz
+Fn = Fs/2;
+Wn = Fc / Fn;
+N = 200;   % μπορείς να πειραματιστείς (π.χ. 100, 300)
+
+b = fir1(N, Wn, 'low');
+a = 1;   % FIR φίλτρο
+
+%% Ερώτημα Γ
+x_clean = filter(b, a, x);
+sound(x_clean, Fs);
+
+%% Ερώτημα Δ
+t = (0:length(x)-1)/Fs;
+idx = t <= 0.2;
+
+figure(1);
+
+subplot(2,1,1);
+plot(t(idx), x(idx));
+grid on;
+xlabel('Time (sec)');
+ylabel('Amplitude');
+title('Θορυβώδες σήμα (0 – 0.2 sec)');
+
+subplot(2,1,2);
+plot(t(idx), x_clean(idx));
+grid on;
+xlabel('Time (sec)');
+ylabel('Amplitude');
+title('Φιλτραρισμένο σήμα (0 – 0.2 sec)');
+
+
+Nfft = 4096;
+
+X = fft(x, Nfft);
+X_clean = fft(x_clean, Nfft);
+
+S_X = abs(X);
+S_X_clean = abs(X_clean);
+
+f = (0:Nfft-1)*Fs/Nfft;
+
+
+figure(2);
+
+subplot(2,1,1);
+plot(f(1:Nfft/2), S_X(1:Nfft/2));
+grid on;
+xlabel('Frequency (Hz)');
+ylabel('|X(f)|');
+title('Φάσμα θορυβώδους σήματος');
+
+subplot(2,1,2);
+plot(f(1:Nfft/2), S_X_clean(1:Nfft/2));
+grid on;
+xlabel('Frequency (Hz)');
+ylabel('|X_{clean}(f)|');
+title('Φάσμα φιλτραρισμένου σήματος');
